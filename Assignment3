@@ -1,1 +1,147 @@
 
+import re
+import time
+
+# Sample contact details
+contacts = [
+    {"name": "Dr. Ravi", "phone": "+91 98400 12345",
+     "email": "ravi@gmail.com"},
+
+    {"name": "Ravi Kumar", "phone": "9840012345",
+     "email": "ravi@gmail.com"},
+
+    {"name": "Priya", "phone": "9876543210",
+     "email": "priya@gmail.com"},
+
+    {"name": "Priya S", "phone": "9876543210",
+     "email": "priya2@gmail.com"},
+
+    {"name": "Arun", "phone": "",
+     "email": "arun@gmail.com"}
+]
+
+
+# Normalize phone number
+def normalize_phone(phone):
+    digits = re.sub(r"\D", "", phone)
+
+    if len(digits) == 12 and digits.startswith("91"):
+        digits = digits[2:]
+
+    return digits
+
+
+# Normalize name
+def normalize_name(name):
+    name = re.sub(r"[^a-zA-Z ]", "", name.lower())
+    name = re.sub(r"\bdr\b", "", name)
+    return " ".join(name.split())
+
+
+# Normalize email
+def normalize_email(email):
+    return email.strip().lower()
+
+
+# Contact merging using dictionaries
+def merge_contacts(contacts):
+
+    parent = list(range(len(contacts)))
+    number_index = {}
+    email_index = {}
+
+    # Find parent
+    def find(x):
+        if parent[x] != x:
+            parent[x] = find(parent[x])
+        return parent[x]
+
+    # Merge two contacts
+    def union(a, b):
+        a = find(a)
+        b = find(b)
+
+        if a != b:
+            parent[b] = a
+
+    # Find duplicate contacts
+    for i, contact in enumerate(contacts):
+
+        phone = normalize_phone(contact.get("phone", ""))
+        email = normalize_email(contact.get("email", ""))
+
+        if phone:
+            if phone in number_index:
+                union(i, number_index[phone])
+            else:
+                number_index[phone] = i
+
+        if email:
+            if email in email_index:
+                union(i, email_index[email])
+            else:
+                email_index[email] = i
+
+    # Store merged contacts
+    merged = {}
+
+    for i, contact in enumerate(contacts):
+        root = find(i)
+
+        if root not in merged:
+            merged[root] = {
+                "names": set(),
+                "phones": set(),
+                "emails": set()
+            }
+
+        name = contact.get("name", "")
+        phone = normalize_phone(contact.get("phone", ""))
+        email = normalize_email(contact.get("email", ""))
+
+        if name:
+            merged[root]["names"].add(normalize_name(name))
+
+        if phone:
+            merged[root]["phones"].add(phone)
+
+        if email:
+            merged[root]["emails"].add(email)
+
+    # Dictionary keyed by normalized phone
+    result = {}
+
+    for person in merged.values():
+        numbers = person["phones"]
+
+        if numbers:
+            key = sorted(numbers)[0]
+        elif person["emails"]:
+            key = sorted(person["emails"])[0]
+        else:
+            key = "contact_" + str(len(result) + 1)
+
+        result[key] = person
+
+    return result
+
+
+# Test the program
+start = time.perf_counter()
+
+result = merge_contacts(contacts)
+
+end = time.perf_counter()
+
+print("MERGED CONTACTS")
+
+for key, person in result.items():
+    print("\nKey:", key)
+    print("Names:", person["names"])
+    print("Phones:", person["phones"])
+    print("Emails:", person["emails"])
+
+print("\nTotal original contacts:", len(contacts))
+print("Total merged contacts:", len(result))
+print("Execution time:", end - start, "seconds")
+
