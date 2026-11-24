@@ -1,1 +1,32 @@
 
+# Manual checking example
+
+complaints = [
+    "Roads are clean and the bus was fast.",
+    "Smoke from the factory, air is bad.",
+    "The staff were not helpful.",
+    "Not bad, service improved."
+]
+
+my_labels = [
+    "positive",
+    "negative",
+    "negative",
+    "positive"
+]
+
+correct = 0
+
+for i in range(len(complaints)):
+
+    predicted = label(complaints[i])
+
+    if predicted == my_labels[i]:
+        correct += 1
+
+    print("Expected:", my_labels[i])
+    print("Predicted:", predicted)
+
+print("Correct labels:", correct)
+print("Total complaints:", len(complaints))
+
