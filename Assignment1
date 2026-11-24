@@ -1,1 +1,52 @@
 
+# Milk Rate Calculator
+
+# Function to select seasonal rate
+def get_rate(season):
+    if season == "April-June":
+        return 32.00, 0.45
+    else:
+        return 32.00, 0.45  # Change this when the second season's rate is known
+
+
+# Function to calculate bonus
+def calculate_bonus(quantity):
+    if quantity > 500:
+        return 0.50
+    else:
+        return 0.00
+
+
+# Main program
+season = input("Enter season (April-June or Other): ")
+
+fat = round(float(input("Enter Fat value: ")), 2)
+snf = round(float(input("Enter SNF value: ")), 2)
+
+quantity = float(input("Enter total milk supplied in 10 days: "))
+
+# Get seasonal rates
+base_rate, fat_rate = get_rate(season)
+
+# Calculate milk rate
+milk_rate = base_rate + (fat * fat_rate)
+
+# Calculate bonus
+bonus = calculate_bonus(quantity)
+
+# Calculate final amount
+final_rate = milk_rate + bonus
+total_amount = quantity * final_rate
+
+# Display results
+print("\n----- MILK BILL -----")
+print("Season:", season)
+print("Fat:", format(fat, ".2f"))
+print("SNF:", format(snf, ".2f"))
+print("Milk Quantity:", quantity)
+print("Base Rate: Rs.", base_rate)
+print("Milk Rate: Rs.", round(milk_rate, 2))
+print("Bonus per litre: Rs.", bonus)
+print("Final Rate: Rs.", round(final_rate, 2))
+print("Total Amount: Rs.", round(total_amount, 2))
+
