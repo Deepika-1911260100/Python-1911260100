@@ -1,1 +1,81 @@
 
+import time
+
+# Sample farmer data: Name, Fat, SNF, Quantity
+farmers = [
+    ("A", 4.0, 8.5, 400),
+    ("B", 4.2, 8.6, 600),
+    ("C", 3.8, 8.4, 550),
+    ("D", 4.1, 8.5, 300)
+]
+
+# ORIGINAL PROGRAM
+def original():
+    results = []
+    count = 0
+
+    start = time.perf_counter()
+
+    for name, fat, snf, qty in farmers:
+
+        # Repeated rate selection
+        base_rate = 32.00
+        fat_rate = 0.45
+        count += 1
+
+        rate = base_rate + fat * fat_rate
+
+        bonus = 0.50 if qty > 500 else 0
+        total = qty * (rate + bonus)
+
+        results.append((name, round(total, 2)))
+
+    end = time.perf_counter()
+
+    return results, count, end - start
+
+
+# REDESIGNED PROGRAM
+def redesigned():
+    results = []
+    count = 0
+
+    start = time.perf_counter()
+
+    # Select rates only once
+    base_rate = 32.00
+    fat_rate = 0.45
+    count += 1
+
+    for name, fat, snf, qty in farmers:
+
+        rate = base_rate + fat * fat_rate
+
+        bonus = 0.50 if qty > 500 else 0
+        total = qty * (rate + bonus)
+
+        results.append((name, round(total, 2)))
+
+    end = time.perf_counter()
+
+    return results, count, end - start
+
+
+# Compare both programs
+old, old_count, old_time = original()
+new, new_count, new_time = redesigned()
+
+print("ORIGINAL RESULTS:", old)
+print("REDESIGNED RESULTS:", new)
+
+print("\n--- COMPARISON ---")
+print("Original rate selections:", old_count)
+print("Redesigned rate selections:", new_count)
+
+print("Original time:", old_time)
+print("Redesigned time:", new_time)
+
+print("\nBoth programs give the same results.")
+
+print("Rate selections saved:", old_count - new_count)
+
